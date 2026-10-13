@@ -132,7 +132,8 @@ class TestGenerator:
         runs_stable_10x = True
         consecutive_passes = 0
         for _ in range(10):
-            if self._run_test_in_isolation(test_code):
+            has_passed = patched_runner() if patched_runner else self._run_test_in_isolation(test_code)
+            if has_passed:
                 consecutive_passes += 1
             else:
                 runs_stable_10x = False

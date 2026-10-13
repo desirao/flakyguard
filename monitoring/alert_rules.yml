@@ -1,0 +1,46 @@
+groups:
+  - name: flakyguard_alerts
+    rules:
+      - alert: FlakyTestQuarantineRecommended
+        expr: flakyguard_flaky_tests_total > 3
+        for: 2m
+        labels:
+          severity: warning
+          component: test_runner
+          repo: desirao/flakyguard
+        annotations:
+          summary: "Intermittent test flakiness detected across identical commits"
+          description: "Test execution flakiness detected with pass-rate variance > 0.2. Automated quarantine recommended."
+
+      - alert: CIRegressionFailureSpike
+        expr: rate(flakyguard_incidents_total{category="sre"}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          component: ci_cd_pipeline
+          repo: desirao/flakyguard
+        annotations:
+          summary: "High rate of SRE build failures in CI"
+          description: "CI build failure rate has exceeded 0.1 failures/sec over the last 5 minutes."
+
+      - alert: IncidentInvestigationLatencyHigh
+        expr: flakyguard_incident_investigation_seconds{quantile="0.95"} > 25
+        for: 3m
+        labels:
+          severity: warning
+          component: langgraph_orchestrator
+          repo: desirao/flakyguard
+        annotations:
+          summary: "LangGraph incident investigation latency p95 > 25s"
+          description: "Multi-agent ReAct investigation is taking longer than expected to synthesize patches."
+
+      - alert: HallucinationRateElevated
+        expr: rate(flakyguard_hallucination_flags_total[10m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: responsible_ai_audit
+          repo: desirao/flakyguard
+        annotations:
+          summary: "Responsible AI audit hallucination rate elevated"
+          description: "The percentage of hallucinations detected in generated commit SHAs or symbol paths has exceeded 5%."
