@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FlakyGuard-AI: Intelligent Developer Platform for CI/CD Failure Triage, Flaky Test Quarantine, and Automated Regression Remediation.">
+  <title>FlakyGuard-AI Console | Intelligent CI/CD Remediation</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Accessible Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header & Navigation -->
+  <header class="app-header" role="banner">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <div class="brand-logo" aria-hidden="true">FG</div>
+        <div>
+          <h1 class="brand-title">FlakyGuard<span>-AI</span></h1>
+        </div>
+        <span class="status-pill" role="status" aria-label="System status operational">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Operational
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <button id="contrast-toggle-btn" class="btn btn-secondary" aria-pressed="false" aria-label="Toggle high contrast accessibility mode">
+          High Contrast
+        </button>
+        <a href="/docs" target="_blank" class="btn btn-secondary" aria-label="Open API Documentation in new tab">
+          API Docs
+        </a>
+        <a href="/metrics" target="_blank" class="btn btn-secondary" aria-label="Open Prometheus metrics in new tab">
+          Prometheus
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" class="main-content" role="main">
+    
+    <!-- Top Metrics Overview -->
+    <section class="stat-grid" aria-label="System Key Performance Indicators">
+      <div class="stat-card">
+        <div class="stat-label">Active Incidents</div>
+        <div class="stat-value" id="stat-active-incidents">3</div>
+        <div class="stat-trend trend-neutral">1 Awaiting Approval</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quarantine Rate</div>
+        <div class="stat-value" id="stat-quarantine-rate">14.2%</div>
+        <div class="stat-trend trend-positive">Stabilized CI train</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Patch Applicability</div>
+        <div class="stat-value" id="stat-patch-rate">94.8%</div>
+        <div class="stat-trend trend-positive">git apply --check verified</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg MTTR (AI Triage)</div>
+        <div class="stat-value" id="stat-mttr">42s</div>
+        <div class="stat-trend trend-positive">-88% vs Manual Triage</div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav" role="tablist" aria-label="Dashboard views">
+      <button class="tab-btn active" role="tab" id="tab-btn-incident" aria-selected="true" aria-controls="tab-panel-incident">
+        Incident Investigation & Remediation
+      </button>
+      <button class="tab-btn" role="tab" id="tab-btn-search" aria-selected="false" aria-controls="tab-panel-search">
+        Semantic Code Navigation
+      </button>
+      <button class="tab-btn" role="tab" id="tab-btn-prompts" aria-selected="false" aria-controls="tab-panel-prompts">
+        Prompt Engineering Library
+      </button>
+      <button class="tab-btn" role="tab" id="tab-btn-diagnostics" aria-selected="false" aria-controls="tab-panel-diagnostics">
+        System Diagnostics & Health
+      </button>
+    </nav>
+
+    <!-- TAB 1: Incident Investigation & Remediation -->
+    <section class="tab-panel active" id="tab-panel-incident" role="tabpanel" aria-labelledby="tab-btn-incident">
+      <div class="dashboard-grid">
+        
+        <!-- Left Column: Trigger / Simulation Form -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">CI Incident Ingestion</h2>
+            <span class="status-pill">HMAC Verified</span>
+          </div>
+
+          <form id="incident-form" aria-label="Submit CI Failure Log for Triage">
+            <div class="form-group">
+              <label for="incident-repo" class="form-label">Repository & Branch</label>
+              <input type="text" id="incident-repo" class="form-control" value="desirao/flakyguard (main)" required>
+            </div>
+
+            <div class="form-group">
+              <label for="incident-commit" class="form-label">Head Commit SHA</label>
+              <input type="text" id="incident-commit" class="form-control" value="c8f2a17" required>
+            </div>
+
+            <div class="form-group">
+              <label for="incident-category-select" class="form-label">Target Failure Category (Optional Override)</label>
+              <select id="incident-category-select" class="form-control">
+                <option value="auto">Auto-Detect via Router (router_v2.md)</option>
+                <option value="sre">SRE / Unhandled Exception</option>
+                <option value="flaky_test">Flaky Test / Race Condition</option>
+                <option value="security">Security / Secret Leakage</option>
+                <option value="cloud_infra">Cloud Infra / Container Timeout</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="incident-log-text" class="form-label">CI Console Failure Trace</label>
+              <textarea id="incident-log-text" class="form-control" spellcheck="false">FAILED tests/test_payment.py::test_charge_card - TimeoutError: Request timed out after 5000ms waiting for lock on card_id=9871
+Traceback (most recent call last):
+  File "app/services/checkout.py", line 84, in process_cart
+    user_id = cart.user.customer_id
+AttributeError: 'NoneType' object has no attribute 'customer_id'</textarea>
+            </div>
+
+            <button type="submit" id="btn-run-investigation" class="btn btn-primary" style="width: 100%;">
+              Execute Agentic Investigation
+            </button>
+          </form>
+        </div>
+
+        <!-- Right Column: Active LangGraph Pipeline & Approval Gate -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">LangGraph Incident Pipeline</h2>
+            <span id="pipeline-status-badge" class="status-pill">Awaiting Human Review</span>
+          </div>
+
+          <!-- Stepper Workflow -->
+          <div class="stepper" aria-label="Investigation pipeline progression">
+            <div class="step-item completed">
+              <div class="step-icon" aria-hidden="true">&#10003;</div>
+              <div class="step-body">
+                <div class="step-title">1. Webhook Ingest & Secret Redaction</div>
+                <div class="step-desc">HMAC validated. Redacted 0 credentials, 1 IP address.</div>
+              </div>
+            </div>
+
+            <div class="step-item completed">
+              <div class="step-icon" aria-hidden="true">&#10003;</div>
+              <div class="step-body">
+                <div class="step-title">2. Chain-of-Thought Router (router_v2)</div>
+                <div class="step-desc">Classified as <strong>sre</strong> (Confidence: 0.96). Routed to SRE Specialist.</div>
+              </div>
+            </div>
+
+            <div class="step-item completed">
+              <div class="step-icon" aria-hidden="true">&#10003;</div>
+              <div class="step-body">
+                <div class="step-title">3. Semantic Code Search & Git Blame</div>
+                <div class="step-desc">Found symbol `process_cart` in `app/services/checkout.py`. Suspect commit `c8f2a17`.</div>
+              </div>
+            </div>
+
+            <div class="step-item completed">
+              <div class="step-icon" aria-hidden="true">&#10003;</div>
+              <div class="step-body">
+                <div class="step-title">4. Patch Synthesis & Doc-Aware Test Gen</div>
+                <div class="step-desc">Generated patch and unit test. Passed 4 validation gates.</div>
+              </div>
+            </div>
+
+            <div class="step-item active">
+              <div class="step-icon" aria-hidden="true">!</div>
+              <div class="step-body">
+                <div class="step-title">5. Human-in-the-Loop Reviewer Gate</div>
+                <div class="step-desc">Awaiting engineer confirmation to push branch and open GitHub Draft PR.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4-Tier Validation Gates Display -->
+          <h3 class="form-label" style="margin-top: 1rem;">4-Tier Deterministic Validation Gates</h3>
+          <div class="gates-container">
+            <div class="gate-badge pass">
+              <span aria-hidden="true">&#10004;</span> Gate 1: Fails Before Patch
+            </div>
+            <div class="gate-badge pass">
+              <span aria-hidden="true">&#10004;</span> Gate 2: Passes After Patch
+            </div>
+            <div class="gate-badge pass">
+              <span aria-hidden="true">&#10004;</span> Gate 3: 10x Consecutive Stability
+            </div>
+            <div class="gate-badge pass">
+              <span aria-hidden="true">&#10004;</span> Gate 4: Coverage Delta (+3.8%)
+            </div>
+          </div>
+
+          <!-- Patch Diff Preview -->
+          <h3 class="form-label">Proposed Remediation Patch (git diff -u)</h3>
+          <div class="diff-viewer" tabindex="0" aria-label="Unified git diff viewer">
+            <span class="diff-line-header">--- a/app/services/checkout.py</span>
+            <span class="diff-line-header">+++ b/app/services/checkout.py</span>
+            <span class="diff-line-header">@@ -83,3 +83,5 @@ def process_cart(cart):</span>
+            <span class="diff-line-del">-    user_id = cart.user.customer_id</span>
+            <span class="diff-line-add">+    if not cart or not cart.user:</span>
+            <span class="diff-line-add">+        raise ValueError("Invalid checkout session: cart user cannot be None")</span>
+            <span class="diff-line-add">+    user_id = cart.user.customer_id</span>
+          </div>
+
+          <!-- Action Buttons for Human Gate -->
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <button id="btn-approve-pr" class="btn btn-success" style="flex: 1;">
+              Approve & Open Draft PR
+            </button>
+            <button id="btn-quarantine-test" class="btn btn-secondary">
+              Quarantine Test
+            </button>
+            <button id="btn-reject-patch" class="btn btn-danger">
+              Reject
+            </button>
+          </div>
+
+          <!-- Notification Feedback Region -->
+          <div id="action-notification" class="stat-trend" style="margin-top: 0.75rem;" role="status" aria-live="polite"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: Semantic Code Navigation Playground -->
+    <section class="tab-panel" id="tab-panel-search" role="tabpanel" aria-labelledby="tab-btn-search">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Sourcegraph OSS Code Navigation & Git Fallback</h2>
+          <span class="status-pill" id="search-engine-pill">Engine: Local Git Fallback</span>
+        </div>
+
+        <form id="search-form" class="form-group" style="display: flex; gap: 0.75rem;">
+          <label for="search-query-input" class="visually-hidden">Search Query Pattern</label>
+          <input type="text" id="search-query-input" class="form-control" placeholder='Search symbol or pattern (e.g. type:symbol SourcegraphClient, or "TimeoutError")' value="type:symbol SourcegraphClient" required>
+          <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Run Search</button>
+        </form>
+
+        <h3 class="form-label">Search Query Results</h3>
+        <div id="search-results-list" style="display: flex; flex-direction: column; gap: 0.75rem;" role="region" aria-live="polite">
+          <div class="stat-card" style="padding: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--accent-cyan);">
+              <span>desirao/flakyguard &bull; tools/sourcegraph.py:L51</span>
+              <span>Confidence: 0.70 [Fallback Git]</span>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.35rem; color: var(--text-main);">
+              class SourcegraphClient:
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Prompt Engineering Library Explorer -->
+    <section class="tab-panel" id="tab-panel-prompts" role="tabpanel" aria-labelledby="tab-btn-prompts">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Versioned Prompt Library Inspector</h2>
+          <span class="status-pill">8 Prompts Versioned</span>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="btn btn-secondary prompt-sel-btn active" data-prompt="router_v2">router_v2.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="router_v1">router_v1.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="specialist_sre_v1">specialist_sre_v1.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="patch_v1">patch_v1.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="testgen_v1">testgen_v1.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="explain_v1">explain_v1.md</button>
+          <button class="btn btn-secondary prompt-sel-btn" data-prompt="judge_v1">judge_v1.md</button>
+        </div>
+
+        <div class="diff-viewer" id="prompt-viewer-content" style="max-height: 400px; white-space: pre-wrap;" tabindex="0" aria-label="Prompt template content">
+# FlakyGuard Incident Router Prompt (v2 — Hardened & Few-Shot Anchored)
+
+You are the Senior Incident Triage Orchestrator for FlakyGuard-AI.
+Categorize incoming CI failures with strict JSON schema:
+- sre
+- security
+- cloud_infra
+- flaky_test
+- unknown
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: System Diagnostics & Health -->
+    <section class="tab-panel" id="tab-panel-diagnostics" role="tabpanel" aria-labelledby="tab-btn-diagnostics">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">System Health & Docker Profiles</h2>
+          <span class="status-pill">FastAPI :8000</span>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom: 1.5rem;">
+          <div class="stat-card">
+            <div class="stat-label">FastAPI Status</div>
+            <div class="stat-value" style="color: var(--accent-emerald);">HEALTHY</div>
+            <div class="stat-trend trend-positive">Uptime: 100%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Sourcegraph OSS</div>
+            <div class="stat-value" style="color: var(--accent-amber);">OFFLINE</div>
+            <div class="stat-trend trend-neutral">Deterministic Git Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Prometheus Metric Exporter</div>
+            <div class="stat-value" style="color: var(--accent-emerald);">MOUNTED</div>
+            <div class="stat-trend trend-positive">Path: /metrics</div>
+          </div>
+        </div>
+
+        <h3 class="form-label">Docker Compose Profiles Summary</h3>
+        <ul style="list-style-type: none; font-size: 0.875rem; color: var(--text-muted); line-height: 2;">
+          <li>&bull; <strong>--profile lite:</strong> FastAPI Core (:8000), Redis (:6379), PostgreSQL (:5432), Prometheus (:9090)</li>
+          <li>&bull; <strong>--profile full:</strong> Adds Sourcegraph OSS (:7080) and Ollama LLM Runner (:11434)</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer" role="contentinfo">
+    <p>
+      <strong>FlakyGuard-AI</strong> &bull; CSE 4011 Intelligent Developer Tools and AI DevOps Workflows &bull; BML Munjal University
+    </p>
+    <p style="margin-top: 0.25rem;">
+      Contributors: Rahul Yadav (<a href="https://github.com/desirao" target="_blank" rel="noopener noreferrer">@desirao</a>), Saumil Gupta, Piyush Joon &bull; WCAG 2.1 AA Compliant
+    </p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
