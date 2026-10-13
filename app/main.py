@@ -60,6 +60,13 @@ if os.path.exists(static_dir):
         if os.path.exists(index_path):
             return FileResponse(index_path)
         return {"message": "FlakyGuard Web Console static files not found"}
+
+    @app.get("/presentation", include_in_schema=False)
+    async def serve_presentation():
+        pres_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "presentation", "slides.html")
+        if os.path.exists(pres_path):
+            return FileResponse(pres_path)
+        return {"message": "Presentation slides not found"}
 else:
     @app.get("/", include_in_schema=False)
     async def serve_root():

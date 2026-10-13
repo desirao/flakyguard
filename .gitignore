@@ -38,3 +38,4 @@ data/*
 !data/runbooks/
 *.sqlite3
 *.db
+scratch/
