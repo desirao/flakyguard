@@ -10,6 +10,7 @@ from prometheus_client import make_asgi_app
 
 from app.config import settings
 from app.api.health import router as health_router
+from app.api.rag import router as rag_router
 
 
 @asynccontextmanager
@@ -37,6 +38,7 @@ app.add_middleware(
 
 # Include API Routers
 app.include_router(health_router)
+app.include_router(rag_router)
 
 # Mount Prometheus metrics endpoint
 if settings.PROMETHEUS_METRICS_ENABLED:
