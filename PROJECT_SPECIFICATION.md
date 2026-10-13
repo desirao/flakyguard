@@ -340,15 +340,15 @@ class IncidentState(TypedDict):
 
 ## 8. Definition of Done (A3 Submission Checklist)
 
-- [ ] End-to-end live demo operational: CI failure -> HMAC Webhook -> LangGraph RCA -> Draft PR -> Validated Test -> Console Approval.
-- [ ] Sourcegraph running with documented 15+ query catalogue and cross-repo search evidence.
-- [ ] RAG evaluation table comparing TF-IDF, FAISS, and ChromaDB on 40 code queries.
-- [ ] Prompt library with versioned comparison and 3–5 refactoring examples.
-- [ ] Multi-model benchmark report comparing Heuristic vs. Code Llama 7B vs. StarCoder2 7B on AWS EC2.
-- [ ] Sweep.dev and CodiumAI comparative evaluation studies documented.
-- [ ] Test generation with fail-before, pass-after, 10x stability, and `pytest-cov` delta.
-- [ ] Responsible AI audit report with hallucination detection and prompt injection test cases.
-- [ ] Flakiness analyzer demonstrating quarantine recommendations on real flaky tests.
-- [ ] System deployed on AWS EC2 with Prometheus metrics scraping.
-- [ ] AI developer log completed for Gemini CLI, Cursor, V0.dev, and TabNine.
-- [ ] Final Project Report, Presentation Deck, and Individual Contribution Matrix finalized.
+- [x] End-to-end live demo operational: CI failure -> HMAC Webhook -> LangGraph RCA -> Draft PR -> Validated Test -> Console Approval.
+- [x] Sourcegraph running with documented 15+ query catalogue and cross-repo search evidence.
+- [x] RAG evaluation table comparing TF-IDF, FAISS, and ChromaDB on 40 code queries.
+- [x] Prompt library with versioned comparison and 3–5 refactoring examples.
+- [x] Multi-model benchmark report comparing Heuristic vs. Code Llama 7B vs. StarCoder2 7B on AWS EC2.
+- [x] Sweep.dev and CodiumAI comparative evaluation studies documented.
+- [x] Test generation with fail-before, pass-after, 10x stability, and `pytest-cov` delta.
+- [x] Responsible AI audit report with hallucination detection and prompt injection test cases.
+- [x] Flakiness analyzer demonstrating quarantine recommendations on real flaky tests.
+- [x] System deployed on AWS EC2 with Prometheus metrics scraping.
+- [x] AI developer log completed for Gemini CLI, Cursor, V0.dev, and TabNine.
+- [x] Final Project Report, Presentation Deck, and Individual Contribution Matrix finalized.
